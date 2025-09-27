@@ -1,5 +1,6 @@
-#include "M5CUtil.h"
 #include "M5Unified.h"
+#include "M5GFX.h"
+#include "M5CUtil.h"
 #include <malloc.h>
 
 #ifdef __cplusplus
@@ -220,7 +221,115 @@ void m5gpio_write(int pin, int level)
   gpio_set_level((gpio_num_t)gpio_num, level ? 1 : 0);
 }
 
+// lcd.cppに入れたい
+M5GFX Lcd;
 
+void m5lcd_init(void)
+{
+  Lcd.begin();
+  Lcd.setRotation(1);
+  Lcd.fillScreen(BLACK);
+  Lcd.setTextColor(WHITE);
+  Lcd.setTextSize(1);
+  Lcd.setCursor(0, 0);
+}
+
+void m5lcd_set_brightness(uint8_t brightness)
+{
+  Lcd.setBrightness(brightness);
+}
+
+void m5lcd_draw_pixel(int16_t x, int16_t y, uint16_t color)
+{
+  Lcd.drawPixel(x, y, color);
+}
+
+void m5lcd_draw_line(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
+{
+  Lcd.drawLine(x1, y1, x2, y2, color);
+}
+
+void m5lcd_draw_rect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+{
+  Lcd.drawRect(x, y, w, h, color);
+}
+
+void m5lcd_fill_rect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+{
+  Lcd.fillRect(x, y, w, h, color);
+}
+
+void m5lcd_fill_screen(uint16_t color)
+{
+  Lcd.fillScreen(color);
+}
+
+void m5lcd_clear(void)
+{
+  Lcd.fillScreen(BLACK);
+  M5.Lcd.fillScreen(BLACK);
+  M5.Lcd.setCursor(0, 0);
+}
+
+void m5lcd_circle(int16_t x, int16_t y, int16_t r, uint16_t color)
+{
+  Lcd.drawCircle(x, y, r, color);
+}
+
+void m5lcd_fill_circle(int16_t x, int16_t y, int16_t r, uint16_t color)
+{
+  Lcd.fillCircle(x, y, r, color);
+}
+
+void m5lcd_draw_triangle(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color)
+{
+  Lcd.drawTriangle(x1, y1, x2, y2, x3, y3, color);
+}
+
+void m5lcd_fill_triangle(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color)
+{
+  Lcd.fillTriangle(x1, y1, x2, y2, x3, y3, color);
+}
+
+void m5lcd_draw_round_rect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
+{
+  Lcd.drawRoundRect(x, y, w, h, r, color);
+}
+
+void m5lcd_fill_round_rect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
+{
+  Lcd.fillRoundRect(x, y, w, h, r, color);
+}
+
+void m5lcd_draw_bitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t *data)
+{
+  Lcd.drawBitmap(x, y, w, h, data);
+}
+
+void m5lcd_draw_char(int16_t x, int16_t y, char c, uint16_t fc, uint16_t bc, uint8_t sz)
+{
+  Lcd.drawChar(x, y, c, bc, fc, sz);
+}
+
+void m5lcd_set_cursor(int16_t x, int16_t y)
+{
+  M5.Lcd.setCursor(x, y);
+}
+
+void m5lcd_set_text_color(uint16_t fc)
+{
+  M5.Lcd.setTextColor(fc);
+}
+
+void m5lcd_set_text_size(uint8_t s)
+{
+  M5.Lcd.setTextSize(s);
+}
+
+void m5lcd_set_text_wrap(uint8_t wx, uint8_t wy)
+{
+  M5.Lcd.setTextWrap((bool)wx, (bool)wy);
+}
 
 #ifdef __cplusplus
 }

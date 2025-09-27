@@ -37,6 +37,30 @@ void m5gpio_init(void);
 void m5gpio_write(int pin, int level);
 
 
+//
+// lcd.cpp
+//
+void m5lcd_init(void);
+void m5lcd_set_brightness(uint8_t brightness);
+void m5lcd_draw_pixel(int16_t x, int16_t y, uint16_t color);
+void m5lcd_draw_line(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
+void m5lcd_draw_rect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+void m5lcd_fill_rect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+void m5lcd_fill_screen(uint16_t color);
+void m5lcd_clear(void);
+void m5lcd_circle(int16_t x, int16_t y, int16_t r, uint16_t color);
+void m5lcd_fill_circle(int16_t x, int16_t y, int16_t r, uint16_t color);
+void m5lcd_draw_triangle(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color);
+void m5lcd_fill_triangle(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color);
+void m5lcd_draw_round_rect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color);
+void m5lcd_fill_round_rect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color);
+void m5lcd_draw_bitmap(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t *data);
+void m5lcd_draw_char(int16_t x, int16_t y, char c, uint16_t color, uint16_t bg, uint8_t size);
+void m5lcd_set_cursor(int16_t x, int16_t y);
+void m5lcd_set_text_color(uint16_t fc);
+void m5lcd_set_text_size(uint8_t s);
+void m5lcd_set_text_wrap(uint8_t wx, uint8_t wy);
+
 #ifdef __cplusplus
 }
 #endif
