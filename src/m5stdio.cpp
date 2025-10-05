@@ -331,6 +331,16 @@ void m5lcd_set_text_wrap(uint8_t wx, uint8_t wy)
   M5.Lcd.setTextWrap((bool)wx, (bool)wy);
 }
 
+/// 加速度センサー
+void m5accel_read(float *x, float *y, float *z)
+{
+    M5.Imu.update();
+    auto imu_data = M5.Imu.getImuData();
+    *x = imu_data.accel.x;
+    *y = imu_data.accel.y;
+    *z = imu_data.accel.z;
+}
+
 #ifdef __cplusplus
 }
 #endif
