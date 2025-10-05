@@ -61,6 +61,11 @@ void m5lcd_set_text_color(uint16_t fc);
 void m5lcd_set_text_size(uint8_t s);
 void m5lcd_set_text_wrap(uint8_t wx, uint8_t wy);
 
+//
+// m5accel
+//
+void m5accel_read(float *x, float *y, float *z);
+
 #ifdef __cplusplus
 }
 #endif
