@@ -66,6 +66,15 @@ void m5lcd_set_text_wrap(uint8_t wx, uint8_t wy);
 //
 void m5accel_read(float *x, float *y, float *z);
 
+//
+// usb_serial
+//
+void usb_serial_init(void);
+void usb_serial_send_byte(uint8_t b);
+void usb_serial_send_bytes(uint8_t *b, size_t len);
+int16_t usb_serial_receive_byte(void);
+size_t usb_serial_receive_bytes(uint8_t *b, size_t len);
+
 #ifdef __cplusplus
 }
 #endif
