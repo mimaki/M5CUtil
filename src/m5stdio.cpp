@@ -158,7 +158,7 @@ void m5i2c_init(void)
   // ESP_ERROR_CHECK(i2c_driver_install(I2C_MASTER_NUM, conf.mode, 0, 0, 0));
 
   // Groveポート I2C初期化 (Port0, SDA=2, SCL=1)
-  bool result = M5.In_I2C.begin(I2C_MASTER_NUM, I2C_MASTER_SDA_IO, I2C_MASTER_SCL_IO);
+  bool result = M5.Ex_I2C.begin(I2C_MASTER_NUM, I2C_MASTER_SDA_IO, I2C_MASTER_SCL_IO);
 
   m5printf("I2C initialized: %s\n", result ? "OK" : "Failed");
 }
@@ -166,12 +166,12 @@ void m5i2c_init(void)
 int m5i2c_write(uint8_t addr, const uint8_t *data, size_t len, uint8_t stop)
 {
   // esp_err_t ret = i2c_master_write_to_device(I2C_MASTER_NUM, addr, data, len, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
-  // M5.In_I2C.beginTransmission(addr);
-  M5.In_I2C.start(addr, false, I2C_MASTER_FREQ_HZ);
-  bool result = M5.In_I2C.write(data, len);
-  // int ret = M5.In_I2C.endTransmission(stop ? 1 : 0);
+  // M5.Ex_I2C.beginTransmission(addr);
+  M5.Ex_I2C.start(addr, false, I2C_MASTER_FREQ_HZ);
+  bool result = M5.Ex_I2C.write(data, len);
+  // int ret = M5.Ex_I2C.endTransmission(stop ? 1 : 0);
   if (stop) {
-    M5.In_I2C.stop();
+    M5.Ex_I2C.stop();
   }
 m5printf("m5i2c_write: addr=0x%02x, len=%d, ret=%d\n", addr, len, result ? 0 : -1);
   return result ? 0 : -1;
@@ -180,15 +180,15 @@ m5printf("m5i2c_write: addr=0x%02x, len=%d, ret=%d\n", addr, len, result ? 0 : -
 size_t m5i2c_read(uint8_t addr, uint8_t *data, size_t len, uint8_t stop)
 {
   // esp_err_t ret = i2c_master_read_from_device(I2C_MASTER_NUM, addr, data, len, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
-  // M5.In_I2C.requestFrom((int)addr, len);
-  M5.In_I2C.start(addr, true, I2C_MASTER_FREQ_HZ);
+  // M5.Ex_I2C.requestFrom((int)addr, len);
+  M5.Ex_I2C.start(addr, true, I2C_MASTER_FREQ_HZ);
   // size_t i = 0;
   // for (i=0; i<len; i++) {
-  //   data[i] = (uint8_t)M5.In_I2C.read();
+  //   data[i] = (uint8_t)M5.Ex_I2C.read();
   // }
-  int result = M5.In_I2C.read(data, len);
-  M5.In_I2C.stop();
-  // if (stop) M5.In_I2C.endTransmission(1);
+  int result = M5.Ex_I2C.read(data, len);
+  M5.Ex_I2C.stop();
+  // if (stop) M5.Ex_I2C.endTransmission(1);
   // int ret = result ? ESP_OK : ESP_FAIL;
 m5printf("m5i2c_read: addr=0x%02x, len=%d, result=%d\n", addr, len, result);
   return result ? len : 0;
