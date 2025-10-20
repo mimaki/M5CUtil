@@ -384,6 +384,67 @@ size_t usb_serial_receive_bytes(uint8_t *b, size_t len)
 }
 
 
+/// dir.cppに入れたい
+#include <dirent.h>
+
+dir_entry *create_dir_entry(const char *name)
+{
+  dir_entry *entry = (dir_entry *)malloc(sizeof(dir_entry));
+  if (entry) {
+    entry->name = (char *)malloc(strlen(name) + 1);
+    if (entry->name) {
+      strcpy(entry->name, name);
+    }
+    entry->next = NULL;
+  }
+  return entry;
+}
+
+// List .mrb files in the specified directory
+dir_entry *list_mrb_files(const char *path)
+{
+  dir_entry *head = NULL;
+  dir_entry *tail = NULL;
+
+  DIR *dir = opendir(path);
+  if (dir == NULL) {
+    m5printf("Failed to open directory: %s\n", path);
+    return NULL;
+  }
+  struct dirent *entry;
+  while ((entry = readdir(dir)) != NULL) {
+    char *dname = entry->d_name;
+    if (entry->d_type == DT_REG &&  // 通常ファイル
+        !strchr(dname, '~') &&      // ロングネーム削除
+        (strstr(dname, ".MRB") || strstr(dname, ".mrb"))) { // .MRBまたは.mrb拡張子
+      dir_entry *dir = create_dir_entry(entry->d_name);
+      if (head == NULL) head = dir;
+      if (tail) {
+        tail->next = dir;
+        tail = dir;
+      }
+      else {
+        tail = dir;
+      }
+      m5printf("Found mrb file: %s/%s\n", path, entry->d_name);
+    }
+  }
+  closedir(dir);
+  return head;
+}
+
+// Free the directory entry list
+void free_dir_list(dir_entry *head)
+{
+  dir_entry *current = head;
+  while (current) {
+    dir_entry *next = current->next;
+    if (current->name) free(current->name);
+    free(current);
+    current = next;
+  }
+}
+
 #ifdef __cplusplus
 }
 #endif

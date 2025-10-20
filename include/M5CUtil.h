@@ -75,6 +75,16 @@ void usb_serial_send_bytes(uint8_t *b, size_t len);
 int16_t usb_serial_receive_byte(void);
 size_t usb_serial_receive_bytes(uint8_t *b, size_t len);
 
+// mrb file list
+struct tag_dir_entry {
+  struct tag_dir_entry *next;
+  char *name;
+};
+typedef struct tag_dir_entry dir_entry;
+
+dir_entry *list_mrb_files(const char *path);
+void free_dir_list(dir_entry *head);
+
 #ifdef __cplusplus
 }
 #endif
