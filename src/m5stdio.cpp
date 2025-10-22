@@ -94,6 +94,29 @@ int m5puts(const char *s)
   return len + 1; // +1 for newline
 }
 
+int m5getc(FILE *stream)
+{
+  int c = -1;
+  while (1) {
+    c = fgetc(stream);
+    if (c != EOF) break;
+    M5.update();
+    vTaskDelay(1);
+  }
+  if (c >= ' ') {
+    m5putchar(c); // Echo back
+  }
+  else if (c == '\n' || c == '\r') {
+    c = '\n';
+    m5putchar(c); // Echo back
+  }
+  // else if (c == '\r') {
+  //   m5putchar('\n'); // Echo back as newline
+  //   c = '\n';
+  // }
+  return c;
+}
+
 #define SPRINTF_BUFFER_SIZE 256
 // int m5fprintf(FILE *stream, const char *format, ...)
 // {
@@ -426,7 +449,7 @@ dir_entry *list_mrb_files(const char *path)
       else {
         tail = dir;
       }
-      m5printf("Found mrb file: %s/%s\n", path, entry->d_name);
+      // m5printf("Found mrb file: %s/%s\n", path, entry->d_name);
     }
   }
   closedir(dir);

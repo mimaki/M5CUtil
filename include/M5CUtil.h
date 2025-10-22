@@ -14,6 +14,7 @@ int m5putchar(int c);
 int m5puterrchar(int c);
 int m5fputs(const char *s, FILE *stream);
 int m5puts(const char *s);
+int m5getc(FILE *stream);
 // int m5fprintf(FILE *stream, const char *format, ...);
 int m5printf(const char *format, ...);
 
