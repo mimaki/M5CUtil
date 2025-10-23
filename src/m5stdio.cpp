@@ -183,7 +183,7 @@ void m5i2c_init(void)
   // Groveポート I2C初期化 (Port0, SDA=2, SCL=1)
   bool result = M5.Ex_I2C.begin(I2C_MASTER_NUM, I2C_MASTER_SDA_IO, I2C_MASTER_SCL_IO);
 
-  m5printf("I2C initialized: %s\n", result ? "OK" : "Failed");
+  // m5printf("I2C initialized: %s\n", result ? "OK" : "Failed");
 }
 
 int m5i2c_write(uint8_t addr, const uint8_t *data, size_t len, uint8_t stop)
@@ -196,7 +196,7 @@ int m5i2c_write(uint8_t addr, const uint8_t *data, size_t len, uint8_t stop)
   if (stop) {
     M5.Ex_I2C.stop();
   }
-m5printf("m5i2c_write: addr=0x%02x, len=%d, ret=%d\n", addr, len, result ? 0 : -1);
+  // m5printf("m5i2c_write: addr=0x%02x, len=%d, ret=%d\n", addr, len, result ? 0 : -1);
   return result ? 0 : -1;
 }
 
@@ -213,7 +213,7 @@ size_t m5i2c_read(uint8_t addr, uint8_t *data, size_t len, uint8_t stop)
   M5.Ex_I2C.stop();
   // if (stop) M5.Ex_I2C.endTransmission(1);
   // int ret = result ? ESP_OK : ESP_FAIL;
-m5printf("m5i2c_read: addr=0x%02x, len=%d, result=%d\n", addr, len, result);
+  // m5printf("m5i2c_read: addr=0x%02x, len=%d, result=%d\n", addr, len, result);
   return result ? len : 0;
 }
 
