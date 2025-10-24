@@ -440,16 +440,16 @@ dir_entry *list_mrb_files(const char *path)
     if (entry->d_type == DT_REG &&  // 通常ファイル
         !strchr(dname, '~') &&      // ロングネーム削除
         (strstr(dname, ".MRB") || strstr(dname, ".mrb"))) { // .MRBまたは.mrb拡張子
-      dir_entry *dir = create_dir_entry(entry->d_name);
-      if (head == NULL) head = dir;
+      dir_entry *file = create_dir_entry(entry->d_name);
+      if (head == NULL) head = file;
       if (tail) {
-        tail->next = dir;
-        tail = dir;
+        tail->next = file;
+        tail = file;
       }
       else {
-        tail = dir;
+        tail = file;
       }
-      // m5printf("Found mrb file: %s/%s\n", path, entry->d_name);
+      // m5printf("Found mrb file: %s%s (%s)\n", path, entry->d_name, file->name);
     }
   }
   closedir(dir);
