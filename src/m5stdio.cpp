@@ -1,6 +1,7 @@
 #include "M5Unified.h"
 #include "M5GFX.h"
 #include "M5CUtil.h"
+#include <driver/i2s.h>
 #include <malloc.h>
 
 #ifdef __cplusplus
@@ -466,6 +467,145 @@ void free_dir_list(dir_entry *head)
     free(current);
     current = next;
   }
+}
+
+static void writeRegister(uint8_t reg, uint16_t value)
+{
+  value = __builtin_bswap16(value);
+  M5.In_I2C.writeRegister(0x36, reg, (const uint8_t*)&value, 2, 400000);
+}
+
+#define I2S_NUM (0) // I2Sポート番号
+#define I2S_SAMPLE_RATE (16000)
+#define I2S_SAMPLE_BITS (I2S_BITS_PER_SAMPLE_16BIT)
+
+static i2s_chan_handle_t i2s_chan_handle = NULL;
+static void i2s_init(void)
+{
+  // I2S初期化
+  i2s_config_t config;
+  memset(&config, 0, sizeof(i2s_config_t));
+  config.mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX);
+  config.sample_rate = 48000; // dummy setting
+  config.bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT;
+  config.channel_format = I2S_CHANNEL_FMT_ONLY_RIGHT;
+  config.communication_format = I2S_COMM_FORMAT_STAND_I2S;
+  config.dma_buf_count = 4;
+  config.dma_buf_len = 1024;
+  config.tx_desc_auto_clear = true;
+  // I2S pin config
+  i2s_pin_config_t pinConfig;
+  memset(&pinConfig, ~0u, sizeof(i2s_pin_config_t));
+  pinConfig.bck_io_num = GPIO_NUM_34;
+  pinConfig.ws_io_num = GPIO_NUM_33;
+  pinConfig.data_out_num = GPIO_NUM_13;
+  // Setup I2S
+  i2s_driver_install(I2S_NUM_1, &config, 0, nullptr);
+  i2s_set_pin(I2S_NUM_1, &pinConfig);
+  i2s_zero_dma_buffer(I2S_NUM_1);
+  i2s_start(I2S_NUM_1);
+
+  // // GPTのコード ビルド通らない
+  // is2_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(
+  //   I2S_NUM,
+  //   I2S_ROLE_MASTER
+  // );
+  // i2s_new_channel(&chan_cfg, NILL, &i2s_chan_handle);
+
+  // i2s_std_config_t std_cfg = {
+  //   .clk_cfg = I2S_STD_CLK_DEFAULT_CONFIG(I2S_SAMPLE_RATE),
+  //   .slot_cfg = I2S_STD_SLOT_DEFAULT_CONFIG(I2S_SAMPLE_BITS),
+  //   .gpio_cfg = {
+  //     .mclk = I2S_GPIO_UNUSED,
+  //     .bclk = 12,
+  //     .ws = 11,
+  //     .dout = I2S_GPIO_UNUSED,
+  //   },
+  // };
+
+  // i2s_channel_init_std_mode(i2s_chan_handle, &std_cfg);
+  // i2s_chan_handle_start(i2s_chan_handle);
+}
+
+static void i2s_sound_init(void)
+{
+  // setup AW88298 regisgter
+  M5.In_I2C.bitOn(0x36, 0x02, 0b00000100, 400000);
+  writeRegister(0x61, 0x0673);
+  writeRegister(0x04, 0x4040);
+  writeRegister(0x05, 0x0008);
+  writeRegister(0x06, 0b0001110000000111); // I2SCTL: 44.1kHz, 16bits, monoral (他は全部デフォルト値)
+  writeRegister(0x0C, 0x0064);
+  // I2S config
+  i2s_config_t config;
+  memset(&config, 0, sizeof(i2s_config_t));
+  config.mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX);
+  config.sample_rate = 48000; // dummy setting
+  config.bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT;
+  config.channel_format = I2S_CHANNEL_FMT_ONLY_RIGHT;
+  config.communication_format = I2S_COMM_FORMAT_STAND_I2S;
+  config.dma_buf_count = 4;
+  config.dma_buf_len = 1024;
+  config.tx_desc_auto_clear = true;
+  // I2S pin config
+  i2s_pin_config_t pinConfig;
+  memset(&pinConfig, ~0u, sizeof(i2s_pin_config_t));
+  pinConfig.bck_io_num = GPIO_NUM_34;
+  pinConfig.ws_io_num = GPIO_NUM_33;
+  pinConfig.data_out_num = GPIO_NUM_13;
+  // Setup I2S
+  i2s_driver_install(I2S_NUM_1, &config, 0, nullptr);
+  i2s_set_pin(I2S_NUM_1, &pinConfig);
+  i2s_zero_dma_buffer(I2S_NUM_1);
+  i2s_start(I2S_NUM_1);
+}
+
+/// Sound.cppに入れたい
+void m5sound_init(void)
+{
+  // // I2S初期化
+  // // i2s_sound_init();
+  // // i2s_init();
+
+  // // auto spc_cfg = M5.Speaker.config();
+  // M5.Speaker.begin();
+  // M5.Speaker.setVolume(64);
+  // M5.Speaker.setAllChannelVolume(255);
+  // M5.Speaker.setChannelVolume(0, 255);
+
+  // if (!M5.Speaker.isEnabled())
+  // {
+  //   m5printf("Speaker not found.\n");
+  // }
+
+  // M5.begin();
+  M5.Speaker.begin();
+  M5.Speaker.setVolume(64);
+
+  // M5.Speaker.tone(2000, 500);   // 500ms
+  // M5.delay(600);                // 鳴動時間より少し長く
+  // M5.Speaker.stop();
+}
+
+void m5sound_term(void)
+{
+  M5.Speaker.end();
+}
+
+void m5sound_play_tone(float frequency, uint32_t duration_ms)
+{
+  M5.Speaker.tone(frequency, duration_ms);
+}
+
+void m5sound_stop_tone(void)
+{
+  // M5.Speaker.mute();
+  M5.Speaker.stop();
+}
+
+void m5sound_set_volume(uint8_t volume)
+{
+  M5.Speaker.setVolume(volume);
 }
 
 #ifdef __cplusplus

@@ -76,6 +76,10 @@ void usb_serial_send_bytes(uint8_t *b, size_t len);
 int16_t usb_serial_receive_byte(void);
 size_t usb_serial_receive_bytes(uint8_t *b, size_t len);
 
+//
+// dir functions
+//
+
 // mrb file list
 struct tag_dir_entry {
   struct tag_dir_entry *next;
@@ -85,6 +89,15 @@ typedef struct tag_dir_entry dir_entry;
 
 dir_entry *list_mrb_files(const char *path);
 void free_dir_list(dir_entry *head);
+
+//
+// Sound functions
+//
+void m5sound_init(void);
+void m5sound_term(void);
+void m5sound_play_tone(float freq, uint32_t duration);
+void m5sound_stop_tone(void);
+void m5sound_set_volume(uint8_t volume);
 
 #ifdef __cplusplus
 }
