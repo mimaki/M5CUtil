@@ -1,4 +1,5 @@
 #include "M5Unified.h"
+#include "driver/ledc.h"
 #include "M5GFX.h"
 #include "M5CUtil.h"
 #include <malloc.h>
@@ -181,7 +182,7 @@ void m5i2c_init(void)
   // ESP_ERROR_CHECK(i2c_driver_install(I2C_MASTER_NUM, conf.mode, 0, 0, 0));
 
   // Groveポート I2C初期化 (Port0, SDA=2, SCL=1)
-  bool result = M5.Ex_I2C.begin(I2C_MASTER_NUM, I2C_MASTER_SDA_IO, I2C_MASTER_SCL_IO);
+  M5.Ex_I2C.begin(I2C_MASTER_NUM, I2C_MASTER_SDA_IO, I2C_MASTER_SCL_IO);
 
   // m5printf("I2C initialized: %s\n", result ? "OK" : "Failed");
 }
@@ -223,12 +224,14 @@ size_t m5i2c_read(uint8_t addr, uint8_t *data, size_t len, uint8_t stop)
 #define PIN_OUT1 5
 #define PIN_OUT2 6
 #define PIN_OUT3 7
+// #define PIN_GROVE_IN 8
+#define PIN_GROVE_OUT 8
 
 void m5gpio_init(void)
 {
   // 出力ピン設定
   gpio_config_t io_conf = {
-    .pin_bit_mask = (1ULL << PIN_OUT1) | (1ULL << PIN_OUT2) | (1ULL << PIN_OUT3),
+    .pin_bit_mask = (1ULL << PIN_OUT1) | (1ULL << PIN_OUT2) | (1ULL << PIN_OUT3) | (1ULL << PIN_GROVE_OUT),
     .mode = GPIO_MODE_OUTPUT,
     .pull_up_en = GPIO_PULLUP_DISABLE,
     .pull_down_en = GPIO_PULLDOWN_DISABLE,
@@ -239,9 +242,50 @@ void m5gpio_init(void)
 
 void m5gpio_write(int pin, int level)
 {
-  if (pin < 0 || pin > 2) return;
+  if (pin < 0 || pin > 4) return;
   int gpio_num = PIN_OUT1 + pin;
   gpio_set_level((gpio_num_t)gpio_num, level ? 1 : 0);
+}
+
+#define PWM_MODE    LEDC_LOW_SPEED_MODE
+#define PWM_CHANNEL LEDC_CHANNEL_0
+
+void m5pwm_init(void)
+{
+  // Configure LEDC channel
+  static ledc_channel_config_t ledc_channel = {
+    ledc_channel.gpio_num   = (gpio_num_t)PIN_GROVE_OUT,    //PIN_OUT1 + channel,
+    ledc_channel.speed_mode = (ledc_mode_t)PWM_MODE,        //LEDC_HIGH_SPEED_MODE,
+    ledc_channel.channel    = (ledc_channel_t)PWM_CHANNEL,  //(ledc_channel_t)channel,
+    ledc_channel.intr_type = LEDC_INTR_DISABLE,
+    ledc_channel.timer_sel  = LEDC_TIMER_0,
+    ledc_channel.duty       = 0,
+    ledc_channel.hpoint     = 0
+  };
+  ledc_channel_config(&ledc_channel);
+
+  // Configure LEDC timer
+  static ledc_timer_config_t ledc_timer = {
+    ledc_timer.speed_mode = (ledc_mode_t)PWM_MODE,                    //LEDC_HIGH_SPEED_MODE,
+    ledc_timer.duty_resolution = (ledc_timer_bit_t)LEDC_TIMER_13_BIT, //(ledc_timer_bit_t)resolution,
+    ledc_timer.timer_num = (ledc_timer_t)LEDC_TIMER_0,
+    ledc_timer.freq_hz = (uint32_t)440, //freq,
+    ledc_timer.clk_cfg = (ledc_clk_cfg_t)LEDC_AUTO_CLK
+  };
+  ledc_timer_config(&ledc_timer);
+}
+
+void m5pwm_write(uint16_t duty)
+{
+  // Set duty cycle
+  ledc_set_duty(PWM_MODE, PWM_CHANNEL, duty);
+  ledc_update_duty(PWM_MODE, PWM_CHANNEL);
+}
+
+void m5pwm_set_freq(uint32_t freq)
+{
+  // Update frequency
+  ledc_set_freq(PWM_MODE, LEDC_TIMER_0, freq);
 }
 
 // lcd.cppに入れたい

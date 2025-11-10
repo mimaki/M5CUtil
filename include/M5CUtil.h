@@ -36,6 +36,9 @@ size_t m5i2c_read(uint8_t addr, uint8_t *data, size_t len, uint8_t stop);
 //
 void m5gpio_init(void);
 void m5gpio_write(int pin, int level);
+void m5pwm_init(void);
+void m5pwm_write(uint16_t duty);
+void m5pwm_set_freq(uint32_t freq);
 
 
 //
