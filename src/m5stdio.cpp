@@ -224,14 +224,14 @@ size_t m5i2c_read(uint8_t addr, uint8_t *data, size_t len, uint8_t stop)
 #define PIN_OUT1 5
 #define PIN_OUT2 6
 #define PIN_OUT3 7
-// #define PIN_GROVE_IN 8
 #define PIN_GROVE_OUT 8
+#define PIN_OUT5 9
 
 void m5gpio_init(void)
 {
   // 出力ピン設定
   gpio_config_t io_conf = {
-    .pin_bit_mask = (1ULL << PIN_OUT1) | (1ULL << PIN_OUT2) | (1ULL << PIN_OUT3) | (1ULL << PIN_GROVE_OUT),
+    .pin_bit_mask = (1ULL << PIN_OUT1) | (1ULL << PIN_OUT2) | (1ULL << PIN_OUT3) | (1ULL << PIN_OUT5) | (1ULL << PIN_GROVE_OUT),
     .mode = GPIO_MODE_OUTPUT,
     .pull_up_en = GPIO_PULLUP_DISABLE,
     .pull_down_en = GPIO_PULLDOWN_DISABLE,
